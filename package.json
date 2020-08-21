@@ -1,0 +1,27 @@
+{
+  "name": "reduxbone",
+  "version": "1.0.0",
+  "description": "Backbone collections and models backed by Redux",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watchAll"
+  },
+  "keywords": [
+    "Backbone",
+    "Redux",
+    "React",
+    "JS",
+    "Flux",
+    "model",
+    "collection",
+    "ajax"
+  ],
+  "author": "Jerry Pommer <jpommer@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "backbone": "^1.4.0",
+    "jest": "^26.4.0",
+    "redux": "^4.0.5"
+  }
+}
