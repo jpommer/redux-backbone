@@ -1,10 +1,11 @@
 
 const Backbone = require('backbone')
+const { combineReducers } = require('redux')
 const { users, usersPersisted } = require('./test-data')
 const { createStore } = require('redux')
-const peopleReducer = require('../store')
+const { usersReducer } = require('../reducers')
 
-const store = createStore(peopleReducer)
+const store = createStore(combineReducers({users: usersReducer}))
 const { ReduxCollection, ReduxModel } = require('../index')(store)
 
 
@@ -32,23 +33,24 @@ describe('ReduxCollection should', () => {
 
 describe('Redux store should', () => {
   afterAll(() => {
-    store.dispatch({type: 'PEOPLE_DELETE_ALL'})
+    store.dispatch({type: 'USERS_DELETE_ALL'})
   })
   test('be available and receptive to actions', () => {
     const callback = jest.fn()
     store.subscribe(callback)
-    expect(store.getState().length).toEqual(0)
-    store.dispatch({type: 'PEOPLE_ADD', payload: users})
+    console.log(store.getState())
+    expect(store.getState().users.length).toEqual(0)
+    store.dispatch({type: 'USERS_ADD', payload: users})
     expect(callback).toHaveBeenCalled()
-    expect(store.getState().length).toEqual(3)
-    store.dispatch({type: 'PEOPLE_DELETE', payload: users[0]})
-    expect(store.getState().length).toEqual(2)
+    expect(store.getState().users.length).toEqual(3)
+    store.dispatch({type: 'USERS_DELETE', payload: users[0]})
+    expect(store.getState().users.length).toEqual(2)
   })
 })
 
 describe('ReduxCollection CRUD operations should', () => {
   afterEach(() => {
-    store.dispatch({type: 'PEOPLE_DELETE_ALL'})
+    store.dispatch({type: 'USERS_DELETE_ALL'})
   })
   test('create a user in the store when saving a model', () => {
     const callback = jest.fn(() => console.log(store.getState()))
@@ -56,12 +58,12 @@ describe('ReduxCollection CRUD operations should', () => {
     store.subscribe(callback)
     collection.create({firstName: 'Jack', lastName: 'Davis', email: 'jdavis@gmail.tld'})
     expect(callback).toHaveBeenCalled()
-    expect(store.getState().length).toEqual(1)
+    expect(store.getState().users.length).toEqual(1)
   })
 
   test('load the collection from the store when fetch is called', () => {
-    store.dispatch({type: 'PEOPLE_ADD', payload: usersPersisted})
-    expect(store.getState().length).toEqual(3)
+    store.dispatch({type: 'USERS_ADD', payload: usersPersisted})
+    expect(store.getState().users.length).toEqual(3)
     const collection = new ReduxCollection()
     collection.fetch()
     expect(collection.size()).toEqual(3)

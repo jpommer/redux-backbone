@@ -16,11 +16,11 @@ module.exports = function initReduxBackbone(store) {
     sync: (method, model, options) => {
       switch(method) {
         case 'create':
-          return model.store().dispatch({type: 'PEOPLE_ADD', payload: model.toJSON()})
+          return model.store().dispatch({type: 'USERS_ADD', payload: model.toJSON()})
         case 'read':
           return // call selector here
         case 'update':
-          return model.store().dispatch({type: 'PEOPLE_UPDATE', payload: model.toJSON()})
+          return model.store().dispatch({type: 'USERS_UPDATE', payload: model.toJSON()})
         default:
           return
       }
@@ -32,7 +32,7 @@ module.exports = function initReduxBackbone(store) {
     sync: (method, collection, options) => {
       switch(method) {
         case 'read':
-          return collection.reset(collection.store().getState())
+          return collection.reset(collection.store().getState().users)
       }
     }
   })
