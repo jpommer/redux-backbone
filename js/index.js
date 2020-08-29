@@ -1,4 +1,5 @@
 const Backbone = require('backbone')
+const { getUsers } = require('./selectors')
 
 module.exports = function initReduxBackbone(store) {
   Backbone.Collection.mixin({
@@ -18,13 +19,17 @@ module.exports = function initReduxBackbone(store) {
         case 'create':
           return model.store().dispatch({type: 'USERS_ADD', payload: model.toJSON()})
         case 'read':
-          return // call selector here
+          return model.set(getUsers(model.store().getState(), 'ONE_USER', options.id))
         case 'update':
           return model.store().dispatch({type: 'USERS_UPDATE', payload: model.toJSON()})
         default:
           return
       }
-    }
+    },
+    fetch: (response) => {
+      console.log('response', response)
+      return response
+    },
   })
 
   const ReduxCollection = Backbone.Collection.extend({
@@ -32,7 +37,12 @@ module.exports = function initReduxBackbone(store) {
     sync: (method, collection, options) => {
       switch(method) {
         case 'read':
-          return collection.reset(collection.store().getState().users)
+          const store = collection.store()
+          if(options.id) {
+            return collection.add(getUsers(store.getState(), 'ONE_USER', options.id))
+          } else {
+            return collection.reset(getUsers(store.getState(), 'ALL_USERS'))
+          }
       }
     }
   })

@@ -1,43 +1,32 @@
-var users = [
+const users = [
   {
-    firstName: 'Jerry',
-    lastName: 'Pommer',
-    email: 'jpommer@gmail.com'
+    id: 'aela',
+    firstName: 'Aela',
+    lastName: 'the Huntress',
+    email: 'aela@companions.org'
   },
   {
-    firstName: 'Tara',
-    lastName: 'Pommer',
-    email: 'tlshank@gmail.com'
+    id: 'elsif',
+    firstName: 'Elsif',
+    lastName: 'the Fair',
+    email: 'jarl@solitude.gov'
   },
   {
-    firstName: 'Zoe',
-    lastName: 'Pommer',
-    email: 'zoepommer@gmail.com'
+    id: 'balgruuf',
+    firstName: 'Balgruuf',
+    lastName: 'the Greater',
+    email: 'jarl@whiterun.gov'
   }
 ]
 
-var usersPersisted = [
-  {
-    id: 1,
-    firstName: 'Jerry',
-    lastName: 'Pommer',
-    email: 'jpommer@gmail.com'
-  },
-  {
-    id: 2,
-    firstName: 'Tara',
-    lastName: 'Pommer',
-    email: 'tlshank@gmail.com'
-  },
-  {
-    id: 3,
-    firstName: 'Zoe',
-    lastName: 'Pommer',
-    email: 'zoepommer@gmail.com'
-  }
-]
+const oneuser = {
+  id: 'ulfrics',
+  firstname: 'Ulfric',
+  lastName: 'Stormcloak',
+  email: 'ulfric@windhelm.gov'
+}
 
 module.exports = {
   users,
-  usersPersisted
+  oneuser
 }
