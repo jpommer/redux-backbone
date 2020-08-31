@@ -6,8 +6,8 @@ const users = [
     email: 'aela@companions.org'
   },
   {
-    id: 'elsif',
-    firstName: 'Elsif',
+    id: 'elisif',
+    firstName: 'Elisif',
     lastName: 'the Fair',
     email: 'jarl@solitude.gov'
   },

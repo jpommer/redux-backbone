@@ -2,26 +2,24 @@ const Backbone = require('backbone')
 const { getUsers } = require('./selectors')
 
 module.exports = function initReduxBackbone(store) {
+  // const getState = () => store.getState()
+
   Backbone.Collection.mixin({
-    store: function(models, iteratee) {
-      return store
-    }
-  })
-  Backbone.Model.mixin({
-    store: function(models, iteratee) {
-      return store
-    }
+    store: () => store,
+    getState: function() { return store.getState() }
   })
 
   const ReduxModel = Backbone.Model.extend({
     sync: (method, model, options) => {
       switch(method) {
         case 'create':
-          return model.store().dispatch({type: 'USERS_ADD', payload: model.toJSON()})
+          return store.dispatch({type: 'USERS_ADD', payload: model.toJSON()})
         case 'read':
-          return model.set(getUsers(model.store().getState(), 'ONE_USER', options.id))
+          return model.set(getUsers(this.getState(), 'ONE_USER', options.id))
         case 'update':
-          return model.store().dispatch({type: 'USERS_UPDATE', payload: model.toJSON()})
+          return store.dispatch({type: 'USERS_UPDATE', payload: model.toJSON()})
+        case 'delete':
+          return store.dispatch({type: 'USERS_DELETE', payload: model.attributes})
         default:
           return
       }
@@ -37,11 +35,10 @@ module.exports = function initReduxBackbone(store) {
     sync: (method, collection, options) => {
       switch(method) {
         case 'read':
-          const store = collection.store()
           if(options.id) {
-            return collection.add(getUsers(store.getState(), 'ONE_USER', options.id))
+            return collection.add(getUsers(collection.getState(), 'ONE_USER', options.id))
           } else {
-            return collection.reset(getUsers(store.getState(), 'ALL_USERS'))
+            return collection.reset(getUsers(collection.getState(), 'ALL_USERS'))
           }
       }
     }
