@@ -9,4 +9,11 @@ const getUsers = (state, filter, id) => {
   }
 }
 
-module.exports = { getUsers }
+const getSpells = (state, filter, id) => {
+  switch(filter) {
+    default:
+      return state.spells
+  }
+}
+
+module.exports = { getUsers, getSpells }

@@ -1,13 +1,47 @@
 
 const Backbone = require('backbone')
 const { combineReducers } = require('redux')
-const { users, oneuser } = require('./test-data')
+const { oneuser, spells, users } = require('./test-data')
 const { createStore } = require('redux')
-const { usersReducer } = require('../reducers')
-const { getUsers } = require('../selectors')
+const { spellsReducer, usersReducer } = require('../reducers')
+const { getSpells, getUsers } = require('../selectors')
 
-const store = createStore(combineReducers({users: usersReducer}))
+const store = createStore(combineReducers({spells: spellsReducer, users: usersReducer}))
 const { ReduxCollection, ReduxModel } = require('../index')(store)
+
+const usersModelSync = (method, model, options) => {
+  switch(method) {
+    case 'create':
+      return model.getStore().dispatch({type: 'USERS_ADD', payload: model.toJSON()})
+    case 'read':
+      return model.set(getUsers(model.getState(), 'ONE_USER', options.id))
+    case 'update':
+      return model.getStore().dispatch({type: 'USERS_UPDATE', payload: model.toJSON()})
+    case 'delete':
+      return model.getStore().dispatch({type: 'USERS_DELETE', payload: model.attributes})
+    default:
+      return
+  }
+}
+
+const usersCollectionSync = (method, collection, options) => {
+  switch(method) {
+    case 'read':
+      if(options.id) {
+        return collection.add(getUsers(collection.getState(), 'ONE_USER', options.id))
+      } else {
+        return collection.reset(getUsers(collection.getState(), 'ALL_USERS'))
+      }
+  }
+}
+
+const User = ReduxModel.extend({
+  sync: usersModelSync
+})
+const Users = ReduxCollection.extend({
+  model: User,
+  sync: usersCollectionSync
+})
 
 describe('ReduxCollection should', () => {
   test('be an instance of a Backbone collection', () => {
@@ -28,20 +62,20 @@ describe('ReduxCollection should', () => {
     expect(model.get('firstName')).toEqual('Balgruuf')
   })
 
-  test('have a store property on it', () => {
+  test('have a store getter on it', () => {
     const collection = new ReduxCollection()
-    expect(collection.store).toBeDefined()
+    expect(collection.getStore).toBeDefined()
   })
 })
 
-describe('ReduxCollection CRUD operations should', () => {
+describe('ReduxCollection extended by Users - CRUD operations should', () => {
   afterEach(() => {
     store.dispatch({type: 'USERS_DELETE_ALL'})
   })
 
   test('create a user in the store when saving a model', () => {
     const callback = jest.fn()
-    const collection = new ReduxCollection([])
+    const collection = new Users([])
     store.subscribe(callback)
     collection.create({firstName: 'Jack', lastName: 'Davis', email: 'jdavis@gmail.tld'})
     expect(callback).toHaveBeenCalled()
@@ -51,13 +85,13 @@ describe('ReduxCollection CRUD operations should', () => {
   test('load the collection from the store when fetch is called', () => {
     store.dispatch({type: 'USERS_ADD', payload: users})
     expect(getUsers(store.getState(), 'ALL_USERS').length).toEqual(3)
-    const collection = new ReduxCollection()
+    const collection = new Users()
     collection.fetch()
     expect(collection.size()).toEqual(3)
   })
 })
 
-describe('ReduxModel CRUD operations should', () => {
+describe('ReduxModel extended by User - CRUD operations should', () => {
   beforeEach(() => {
     store.dispatch({type: 'USERS_ADD', payload: users})
   })
@@ -66,7 +100,7 @@ describe('ReduxModel CRUD operations should', () => {
   })
 
   test('persist model updates to the store', () => {
-    const collection = new ReduxCollection()
+    const collection = new Users()
     collection.fetch({id: 'aela'}) // specific record fetch
     expect(collection.size()).toEqual(1)
     const model = collection.get('aela')
@@ -77,7 +111,7 @@ describe('ReduxModel CRUD operations should', () => {
   })
 
   test('delete a model from the store when model.destroy() is called', () => {
-    const collection = new ReduxCollection()
+    const collection = new Users()
     collection.fetch()
     expect(getUsers(store.getState(), 'ALL_USERS').length).toEqual(3)
     const aela = collection.get('aela')
@@ -86,7 +120,7 @@ describe('ReduxModel CRUD operations should', () => {
   })
 
   test('create a new model in the store when model.save() is called', () => {
-    const model = new ReduxModel({
+    const model = new User({
       firstName: 'Brelyna',
       lastName: 'Maryon',
       email: 'bmaryon@winterhold.edu'
@@ -97,7 +131,7 @@ describe('ReduxModel CRUD operations should', () => {
 
   describe('Connecting a model or collection to the store should', () => {
     test('update the collection with new data when the store changes', () => {
-      const collection = new ReduxCollection()
+      const collection = new Users()
       collection.fetch()
       expect(collection.size()).toEqual(3)
       const cids = collection.map(model => model.cid)
@@ -124,7 +158,7 @@ describe('ReduxModel CRUD operations should', () => {
     })
 
     test('update the attributes of a model when the store changes', () => {
-      const collection = new ReduxCollection()
+      const collection = new Users()
       collection.fetch()
       const aela = collection.get('aela')
       store.subscribe(() => {
@@ -145,6 +179,73 @@ describe('ReduxModel CRUD operations should', () => {
       expect(aela.changed).toEqual({email: 'aelahunts@companions.org'})
       expect(aela.get('email')).toEqual('aelahunts@companions.org')
       expect(changeCallback).toHaveBeenCalled()
+    })
+  })
+
+  /** Using Backbone.extend to create new models and collections for application
+  * specific data, in the usual way that Backbone is used.
+  */
+  describe('Extending ReduxCollection should', () => {
+    beforeEach(() => {
+      store.dispatch({type: 'SPELLS_ADD', payload: spells})
+    })
+    afterEach(() => {
+      store.dispatch({type: 'SPELLS_DELETE_ALL'})
+    })
+    const spellCollectionSync = (method, collection, options) => {
+      switch(method) {
+        case 'read':
+          return collection.reset(getSpells(collection.getState(), 'ALL_SPELLS'))
+      }
+    }
+
+    test('have access to the selectors and the store', () => {
+      const Spell = ReduxModel.extend({})
+      const Spells = ReduxCollection.extend({
+        model: Spell,
+        sync: spellCollectionSync,
+      })
+      const spells = new Spells()
+      spells.fetch()
+      expect(spells.getStore).toBeDefined()
+      expect(spells.getState).toBeDefined()
+      expect(spells).toBeInstanceOf(ReduxCollection)
+      expect(spells.size()).toBe(3)
+      expect(spells.at(0)).toBeInstanceOf(ReduxModel)
+      expect(spells.at(2).get('name')).toEqual('Conjure Storm Atronach')
+    })
+
+    test('respond to changes in the store', () => {
+      const Spell = ReduxModel.extend({})
+      const Spells = ReduxCollection.extend({
+        model: Spell,
+        sync: spellCollectionSync,
+        initialize: function(options) {
+          this.getStore().subscribe(() => {
+            this.set(getSpells(this.getState('ALL_SPELLS')))
+          })
+        }
+      })
+      const spells = new Spells()
+      spells.fetch()
+      expect(spells.size()).toEqual(3)
+      store.dispatch({
+        type:'SPELLS_ADD',
+        payload: {
+          id: 4,
+          name: 'Bound Bow',
+          level: 'Adept',
+          description: 'Creates a magic bow for 120 seconds. Sheathe it to dispel.'
+        }
+      })
+      expect(spells.size()).toEqual(4)
+      store.dispatch({
+        type: 'SPELLS_DELETE',
+        payload: {
+          id: 4
+        }
+      })
+      expect(spells.size()).toEqual(3)
     })
   })
 })
