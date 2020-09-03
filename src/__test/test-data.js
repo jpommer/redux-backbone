@@ -21,7 +21,7 @@ const users = [
 
 const oneuser = {
   id: 'ulfrics',
-  firstname: 'Ulfric',
+  firstName: 'Ulfric',
   lastName: 'Stormcloak',
   email: 'ulfric@windhelm.gov'
 }
