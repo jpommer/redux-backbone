@@ -2,7 +2,8 @@
   "name": "reduxbone",
   "version": "1.0.0",
   "description": "Backbone collections and models backed by Redux",
-  "main": "index.js",
+  "private": true,
+  "main": "./src/index.js",
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watchAll"
@@ -21,7 +22,13 @@
   "license": "ISC",
   "dependencies": {
     "backbone": "^1.4.0",
-    "jest": "^26.4.0",
+    "jquery": "^3.5.1",
     "redux": "^4.0.5"
+  },
+  "devDependencies": {
+    "http-server": "^0.12.3",
+    "jest": "^26.4.0",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
   }
 }
