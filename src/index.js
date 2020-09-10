@@ -1,7 +1,7 @@
-const { ListView, ItemView } = require('../views/list')
 const Backbone = require('backbone')
-const { users, oneuser } = require('./__test/test-data')
 const _ = require('underscore')
+const { ListView, ItemView } = require('../views/list')
+const { users, oneuser } = require('./__test/test-data')
 
 const User = Backbone.Model.extend({})
 const Users = Backbone.Collection.extend({
@@ -9,40 +9,24 @@ const Users = Backbone.Collection.extend({
 })
 const usersCollection = new Users(users)
 
-const Button = Backbone.Model.extend({})
-const Buttons = Backbone.Collection.extend({
-  model: Button
+const { initButtonGroupView } = require('../views/buttongroup')
+const { Buttons } = require('../views/buttongroup')
+
+const buttonCollection = new Buttons(
+  [
+    {label: 'Add Ulfric', action: 'action-add', show: true},
+    {label: 'Remove Ulfric', action: 'action-remove', show: true},
+    {label: 'Aela to Sarah', action: 'action-change', show: true},
+    {label: 'Reset', action: 'action-reset', show: true}
+  ]
+)
+const ButtonGroupView = initButtonGroupView(usersCollection, oneuser, users)
+const buttonsList = new ButtonGroupView({
+  collection: buttonCollection
 })
+buttonsList.render()
 
-const ButtonGroupView = ListView.extend({
-  model: Button,
-  el: 'div.buttongroup',
-  template: _.template('<div></div>'),
-  tagName: 'div',
-  itemView: ItemView.extend({
-    ulfric: oneuser,
-    users: usersCollection,
-    tagName: 'span',
-    template: _.template('<button><%= label %></button>'),
-    events: {
-      'click button': 'doButton'
-    },
-    doButton: function() {
-      switch (this.model.get('klass')) {
-        case 'action-add':
-          return this.users.add(this.ulfric)
-        case 'action-remove':
-          return this.users.remove(this.users.get('ulfrics'))
-        case 'action-change':
-          return this.users.get('aela').set('firstName', 'Sarah')
-        case 'action-reset':
-          return this.users.set(users)
-      }
-    }
-  })
-})
-
-
+// display the users' names from the Users collection
 const UserItemView = ItemView.extend({
   tagName: 'li',
   template: _.template('<%= firstName %> <%= lastName %>')
@@ -55,26 +39,13 @@ const UsersListView = ListView.extend({
   itemView: UserItemView
 })
 
-
 const usersList_1 = new UsersListView({
   collection: usersCollection
 })
 usersList_1.render()
 
-const buttonCollection = new Buttons(
-  [
-    {label: 'Add Ulfric', klass: 'action-add'},
-    {label: 'Remove Ulfric', klass: 'action-remove'},
-    {label: 'Aela to Sarah', klass: 'action-change'},
-    {label: 'Reset', klass: 'action-reset'}
-  ]
-)
-const buttonsList = new ButtonGroupView({
-  collection: buttonCollection
-})
-buttonsList.render()
 
-
+// display firstname and email from the users collection
 const UserEmailItemView = UserItemView.extend({
   template: _.template('<%= firstName %> - <a href="mailto:<%= email %>"><%= email %></a>'),
 })
@@ -87,6 +58,17 @@ const UsersEmailsListView = UsersListView.extend({
 const usersList_2 = new UsersEmailsListView({
   collection: usersCollection,
 })
-
-
 usersList_2.render()
+
+// another view of the users collection, but not the same instance of it
+const UserLocation = UserItemView.extend({
+  template: _.template('<%= firstName %> <%= lastName %> lives in <%= location %>')
+})
+const UserLocations = UsersListView.extend({
+  el: 'div.users-collection-3',
+  itemView: UserLocation
+})
+const usersList_3 = new UserLocations({
+  collection: new Users(users) // OH NO!! This is why people hate Backbone!
+})
+usersList_3.render()

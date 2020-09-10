@@ -3,18 +3,21 @@ const users = [
     id: 'aela',
     firstName: 'Aela',
     lastName: 'the Huntress',
+    location: 'Jorrvaskr, Whiterun',
     email: 'aela@companions.org'
   },
   {
     id: 'elisif',
     firstName: 'Elisif',
     lastName: 'the Fair',
+    location: 'Blue Palace, Solitude',
     email: 'jarl@solitude.gov'
   },
   {
     id: 'balgruuf',
     firstName: 'Balgruuf',
     lastName: 'the Greater',
+    location: 'Dragonreach, Whiterun',
     email: 'jarl@whiterun.gov'
   }
 ]
@@ -23,6 +26,7 @@ const oneuser = {
   id: 'ulfrics',
   firstName: 'Ulfric',
   lastName: 'Stormcloak',
+  location: 'Palace of the Kings, Windhelm',
   email: 'ulfric@windhelm.gov'
 }
 
