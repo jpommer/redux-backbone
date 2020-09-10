@@ -3,12 +3,14 @@ const _ = require('underscore')
 const { ListView, ItemView } = require('../views/list')
 const { users, oneuser } = require('./__test/test-data')
 
+// Users data containers
 const User = Backbone.Model.extend({})
 const Users = Backbone.Collection.extend({
   model: User,
 })
 const usersCollection = new Users(users)
 
+// buttons
 const { initButtonGroupView } = require('../views/buttongroup')
 const { Buttons } = require('../views/buttongroup')
 
