@@ -18,7 +18,7 @@ const initButtonGroupView = (usersCollection, oneuser, users) => {
       ulfric: oneuser,
       users: usersCollection,
       tagName: 'span',
-      template: _.template('<button><%= label %></button>'),
+      template: _.template('<button title="<%= title %>"><%= label %></button>'),
       events: {
         'click button': 'doButton'
       },

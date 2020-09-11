@@ -16,10 +16,10 @@ const { Buttons } = require('../views/buttongroup')
 
 const buttonCollection = new Buttons(
   [
-    {label: 'Add Ulfric', action: 'action-add', show: true},
-    {label: 'Remove Ulfric', action: 'action-remove', show: true},
-    {label: 'Aela to Sarah', action: 'action-change', show: true},
-    {label: 'Reset', action: 'action-reset', show: true}
+    {label: 'Add Ulfric', title: 'usersCollection.add( {Ulfric model} )', action: 'action-add', show: true},
+    {label: 'Remove Ulfric', title: 'usersCollection.remove( { Ulfric model } )', action: 'action-remove', show: true},
+    {label: 'Aela to Sarah', title: 'aelaModel.set(&quot;firstName&quot;, &quot;Sarah&quot;)', action: 'action-change', show: true},
+    {label: 'Reset', title: 'usersCollection.set( {testUsers} )', action: 'action-reset', show: true}
   ]
 )
 const ButtonGroupView = initButtonGroupView(usersCollection, oneuser, users)
